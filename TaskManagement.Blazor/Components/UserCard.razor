@@ -1,0 +1,32 @@
+﻿@using TaskManagement.Domain.Entities
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">@User.Nombre @User.Apellido</h5>
+        <p class="card-text">Correo: @User.Correo</p>
+        <p class="card-text">Teléfono: @User.Telefono</p>
+        <button class="btn btn-danger" @onclick="DeleteUser">Delete</button>
+        <button class="btn btn-primary" @onclick="ManageTasks">Manage Tasks</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Usuario User { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnManageTasks { get; set; }
+
+    private async Task DeleteUser()
+    {
+        await OnDelete.InvokeAsync(User.Id);
+    }
+
+    private async Task ManageTasks()
+    {
+        await OnManageTasks.InvokeAsync(User.Id);
+    }
+}

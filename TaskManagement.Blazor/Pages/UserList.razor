@@ -1,0 +1,68 @@
+﻿@page "/users"
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+<h3>Users</h3>
+
+<!-- Formulario para crear un nuevo usuario -->
+<EditForm Model="@newUser" OnValidSubmit="CreateUser">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label for="nombre">Nombre:</label>
+        <InputText id="nombre" @bind-Value="newUser.Nombre" />
+    </div>
+    <div>
+        <label for="apellido">Apellido:</label>
+        <InputText id="apellido" @bind-Value="newUser.Apellido" />
+    </div>
+    <div>
+        <label for="correo">Correo:</label>
+        <InputText id="correo" @bind-Value="newUser.Correo" />
+    </div>
+    <div>
+        <label for="telefono">Teléfono:</label>
+        <InputText id="telefono" @bind-Value="newUser.Telefono" />
+    </div>
+    <button type="submit" class="btn btn-success">Create New User</button>
+</EditForm>
+
+<ul>
+    @foreach (var user in users)
+    {
+        <li>
+            @user.Nombre @user.Apellido
+            <button @onclick="() => DeleteUser(user.Id)" class="btn btn-danger">Delete</button>
+            <button @onclick="() => NavigateToTasks(user.Id)" class="btn btn-primary">Manage Tasks</button>
+        </li>
+    }
+</ul>
+
+@code {
+    private Usuario newUser = new Usuario();
+
+    private List<Usuario> users = new List<Usuario>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetAllUsersAsync();
+    }
+
+    private async Task CreateUser()
+    {
+        await UserService.CreateUserAsync(newUser);
+        users = await UserService.GetAllUsersAsync();
+        newUser = new Usuario(); // Limpiar el formulario después de la creación
+    }
+
+    private async Task DeleteUser(int userId)
+    {
+        await UserService.DeleteUserAsync(userId);
+        users = await UserService.GetAllUsersAsync();
+    }
+
+    private void NavigateToTasks(int userId)
+    {
+        NavigationManager.NavigateTo($"/tasks/{userId}");
+    }
+}
